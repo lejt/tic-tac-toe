@@ -1,120 +1,110 @@
-// 1) initialize game 
-//     a) board cleared
-//     b) points zero
-// 2) determine who goes first, player or computer
-//     a) coin toss/rng
-// 3) place marker onclick, but can click again to unselect
-//     a) check if marker can be placed (if empty) 
-//     b) finalize to end turn 
-//     c) check condition of game (winner or loser determination)
-//          i) log points 
-//          ii) reset game (init but don't clear score)
+/* GAME LOGIC TREE */
+// 1) Who goes first? if player, initiate player turn, if computer, initiate computer turn
+// 2a) player turn, allows click, but checks if it can be placed first 
+// 2b) computer turn, checks available spaces
+// 3a i) if player can place, drop a marker on click space
+// 3a ii) if player cannot place, wait for valid input
+// 3b i) computer place marker in available space
+// 4) After marker placement of either player or computer, check if win condition, if not, continue with opposing player turn (step 2)
+// 5) If someone won, who won? add score to player or computer accordingly 
+
 
 const game = {
     playerScore: 0,
     computerScore: 0,
     whoGoesFirst: 1,
     turnCounter: 0,
-    clearBoard: true,                  //dont know what this does yet
     boardTracker: [0,0,0,0,0,0,0,0,0],
     play: () => {
-        // Init gameplay check output
 
-
-
-        
-        // locks in click to switch turn or end game:
-        //btn.addEventListener("click", this.computerTurn);
-
+        //allows player to choose who goes first
         game.turnChooser();
+
         //click start game
         game.startGame();
 
+        //allows player to restart game, clears board but not scores
+
     },
     startGame () {
-        //include start button and cells . check placement above
+        
         const startBtn = document.querySelector("button");
 
         const startTurn = () => {
             (this.whoGoesFirst === 1) ? this.playerTurn() : this.computerTurn(); 
         }
 
+        //allows corresponding player or computer to start turn based on turnChooser
         startBtn.addEventListener("click", startTurn);
-
-        
     },
     turnChooser () {
         const toggleSwitch = document.querySelector("input");
 
-        //switches between -1 and 1, 1 for player goes first, -1 for computer goes first
         const toggleTurn = (e) => {
             this.whoGoesFirst *= -1;
             //console.log(e.target);
-            console.log(this.whoGoesFirst);
+            //console.log(this.whoGoesFirst);
+            (this.whoGoesFirst === 1) ? console.log("Player goes first.") : console.log("Computer goes first.");
         }
 
+        //switches between -1 and 1 when toggle clicked; 1 for player goes first, -1 for computer goes first
         toggleSwitch.addEventListener("click", toggleTurn);
     },
     playerTurn () {
         this.turnCounter = 1;
 
-        const cell = document.querySelector(".game");     //not sure between .game or .game-cell
-        //const btn = document.querySelector(".end-turn-button");
+        const cell = document.querySelector(".game");   
 
-        // allows the placement and removal of marker upon click:
-        // because using method inside object, cant use this.? but have to use game.? 
-        // FOR METHODS THAT USE E, HAVE TO USE GAME., OTHER METHODS CAN USE THIS.
-        cell.addEventListener("click", game.checkPlacement);
+        //allows the clicking of cell and checks if it can be placed
+        cell.addEventListener("click", this.checkPlacement);
     },
     computerTurn () {
         this.turnCounter = -1;
 
-        //finds which cell is empty on board
         let computerChoices = [];
         let idx = 0;
 
-        // for each element in boardTracker array, log the empty cells to computerChoices
-        
+        //finds which cell is empty on board
+        //for each element in boardTracker array, log the empty cells to computerChoices
         this.boardTracker.forEach((item)=> {
             if (item === 0) {
                 computerChoices.push(idx);
             }
             idx += 1;
         });
-        console.log("Current Board: "+this.boardTracker);
-        console.log("Computer Available Choices: "+computerChoices);
+        // console.log("Current Board: "+this.boardTracker);
+        // console.log("Computer Available Choices: "+computerChoices);
 
         //randomly selects a board spot from available choices
         let randomIndex = Math.floor(Math.random()*computerChoices.length);
-        console.log("COMPUTER random index: "+ randomIndex);
-        console.log("COMP CHOICE: "+computerChoices[randomIndex]);
+        //console.log("COMPUTER random index: "+ randomIndex);
+        //console.log("COMP CHOICE: "+computerChoices[randomIndex]);
         this.boardTracker[computerChoices[randomIndex]] = 2;
         const computerChoice = document.getElementById(String(computerChoices[randomIndex]+1));
-        computerChoice.classList.toggle(".visible");
+        
+        computerChoice.classList.toggle(".visible");                         // <----------------------------------
         computerChoice.style.backgroundColor = "blue";
 
-
-        console.log("COMPUTER TURN FINIHSED");
-        console.log("Current Board After Computer Turn: "+this.boardTracker);
+        console.log("COMPUTER TURN FINISHED");
+        //console.log("Current Board After Computer Turn: "+this.boardTracker);
 
         this.checkWinCon(); 
     },
     
     checkPlacement (e) {
-        e.target.style.backgroundColor = "red";
-        //if placement acceptable, initiate placement
-        //check if it can even be placed, if pass, run placement()
+        //checks if placement acceptable, if so, initiate placement
         let markerLocation = parseInt(e.target.id)-1;
         //console.log(markerLocation);
         //console.log(game.boardTracker[markerLocation]);
-        (game.boardTracker[markerLocation] === 0) ? game.placement(e) : alert("You cannot select that cell.");
+        (game.boardTracker[markerLocation] === 0) ? game.placement(e) : alert("You are clicking the wrong area.");
             
     },
     
     placement (e) {
         //toggle image as all cells have both markers hidden
-        e.target.classList.toggle(".visible"); 
-    
+        e.target.classList.toggle(".visible");                               // <----------------------------------
+        e.target.style.backgroundColor = "red";
+
         let markerLocation = parseInt(e.target.id)-1;
     
         //toggle marker on board to record selection from player
@@ -123,8 +113,6 @@ const game = {
 
         console.log("PLAYER TURN FINISHED");
 
-
-        // IS IT THIS. OR GAME. console.log(this.boardTracker);
         this.checkWinCon();
     },
     
@@ -143,7 +131,6 @@ const game = {
                 return this.endGame(this.boardTracker[i]);  
             }
         }
-        
         //vertical check
         let firstRow = [0, 1, 2];
         let secondRow = [3, 4, 5];
@@ -172,6 +159,15 @@ const game = {
                 return this.endGame(this.boardTracker[i]);  
             }
         }
+
+        // Checks if all space on board is occupied and with no winner in sight, proceed to tie game alert
+        const isOccupied = (item) => item !== 0;
+
+        if (this.boardTracker.every(isOccupied)) {
+            return this.endGame(0);
+        }
+
+        // Alternates turns based on turn counter
         if (this.turnCounter === 1) {
             this.computerTurn();
         } else {
@@ -186,13 +182,15 @@ const game = {
             pScore.innerText = this.playerScore;
 
             return alert("Congrats, You Won!")
-        } else {
+        } else if (whoWon === 2) {
             this.computerScore += 1;
 
             const cScore = document.querySelector("#cScore");
             cScore.innerText = this.computerScore;
 
             return alert("Wow, You Really SUCK!");
+        } else {
+            return alert("Tie Game!");
         }
     }
 
@@ -202,14 +200,3 @@ const game = {
 
 
 game.play();
-
-// const cell = document.querySelectorAll(".game-cell");
-// const btn = document.querySelector(".end-turn-button");
-
-
-// // allows the placement and removal of marker upon click:
-// cell.addEventListener("click", checkPlacement(e));
-// // locks in click to switch turn or end game:
-// btn.addEventListener("click", computerTurn);
-
-

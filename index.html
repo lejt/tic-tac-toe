@@ -18,18 +18,35 @@
     <main>
         <div class="game-container">
             <div class="game-info">
-                <h2>Game info here</h2>
-                Player Score : <span id='pScore'>0</span>
-                Computer Score : <span id="cScore">0</span>
-                <br> 
+
                 <h2>Who Goes First?</h2>
-                <label class="switch">
-                    <input type="checkbox">
-                    <span class="slider round"></span>
-                </label>
+
+                <div class="turnChoose">
+                    <span>Player first</span>
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                    <span>Computer first</span>
+                </div>
+
+                <br>
+
                 <button>Start Game</button>
 
+                <br> 
+
+                <div class="game-score">
+                    <div class="playerScore">
+                        Player Score : <span id="pScore"> 0 </span>
+                    </div>
+                    <div class="computerScore">
+                        Computer Score : <span id="cScore"> 0 </span>
+                    </div>
+                </div>
+    
             </div>
+
             <div class="game">
                 <div class="game-cell" id="1"">
                 </div>
@@ -54,7 +71,7 @@
     </main>
 
     <footer>
-        <h4>Footer Space</h4>
+        <h4>Site created by lejt</h4>
     </footer>
 </body>
 
